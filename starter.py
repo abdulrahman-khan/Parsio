@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import re
 import pandas as pd
 import requests
 import google.generativeai as genai
@@ -53,15 +54,11 @@ class ParsioApp(QWidget):
         if not clipboard_text:
             self.log("Clipboard is empty.")
             return
-
         # link or text
         if clipboard_text.lower().startswith("http"):
             content = self.fetch_url_content(clipboard_text)
-            original_source = clipboard_text
         else:
             content = clipboard_text
-            original_source = clipboard_text[:200] + "..." if len(clipboard_text) > 200 else clipboard_text
-
         # process content with gemini
         if content:
             parsed_data = self.parse_with_gemini(content)
@@ -81,8 +78,15 @@ class ParsioApp(QWidget):
             self.log(f"Error fetching URL: {e}")
             return None
 
+    def extract_json(self, text):
+        try:
+            match = re.search(r"\{.*\}", text, re.DOTALL)
+            if match:
+                return match.group(0)
+            return text
+        except Exception:
+            return text
 
-    """parse text with gemini api"""
     def parse_with_gemini(self, text):
         try:
             prompt = (
@@ -99,8 +103,13 @@ class ParsioApp(QWidget):
 
             raw_output = response.candidates[0].content.parts[0].text.strip()
 
-            # Try parsing as JSON
-            parsed_data = json.loads(raw_output)
+            # Debug log raw output
+            self.log(f"Raw Gemini Output:\n{raw_output}")
+
+            # Extract JSON substring from output in case of extra text
+            json_text = self.extract_json(raw_output)
+
+            parsed_data = json.loads(json_text)
 
             # Ensure all fields exist
             required_fields = ["job_title", "company", "location", "salary"]
@@ -110,10 +119,12 @@ class ParsioApp(QWidget):
 
             return parsed_data
 
-        except json.JSONDecodeError:
+        except json.JSONDecodeError as e:
+            self.log(f"JSON decode error: {e}")
             self.save_error(raw_output)
             return None
         except Exception as e:
+            self.log(f"Unexpected error: {e}")
             self.save_error(str(e))
             return None
 
