@@ -15,6 +15,7 @@ load_dotenv()
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 EXCEL_FILE = "job_postings.xlsx"
+ERROR_FILE = "error.txt"
 
 class ParsioApp(QWidget):
     def __init__(self):
@@ -53,6 +54,7 @@ class ParsioApp(QWidget):
             self.log("Clipboard is empty.")
             return
 
+        # link or text
         if clipboard_text.lower().startswith("http"):
             content = self.fetch_url_content(clipboard_text)
             original_source = clipboard_text
@@ -60,13 +62,14 @@ class ParsioApp(QWidget):
             content = clipboard_text
             original_source = clipboard_text[:200] + "..." if len(clipboard_text) > 200 else clipboard_text
 
+        # process content with gemini
         if content:
-            parsed_data = self.parse_with_gemini(content, original_source)
+            parsed_data = self.parse_with_gemini(content)
             if parsed_data:
                 self.pending_changes.append(parsed_data)
                 self.log(f"Pending Add: {parsed_data}")
             else:
-                self.log("Gemini parsing failed.")
+                self.log("Gemini parsing failed. See error.txt for details.")
 
     def fetch_url_content(self, url):
         try:
@@ -78,17 +81,17 @@ class ParsioApp(QWidget):
             self.log(f"Error fetching URL: {e}")
             return None
 
-    def parse_with_gemini(self, text, original_source):
+
+    """parse text with gemini api"""
+    def parse_with_gemini(self, text):
         try:
             prompt = (
                 "Extract the following fields from the job posting text below: "
-                "job_title, company, location, salary, description. "
+                "job_title, company, location, salary. "
                 "ALWAYS return a valid JSON object with these exact keys: "
-                '{"job_title": "", "company": "", "location": "", "salary": "", "description": "", "original_source": ""}. '
-                "Fill 'original_source' with the original URL or pasted text. "
+                '{"job_title": "", "company": "", "location": "", "salary": ""}. '
                 "Do not include any text outside of the JSON object.\n\n"
                 f"Job Posting:\n{text}\n\n"
-                f"Original Source: {original_source}"
             )
 
             model = genai.GenerativeModel("gemini-1.5-flash")
@@ -100,7 +103,7 @@ class ParsioApp(QWidget):
             parsed_data = json.loads(raw_output)
 
             # Ensure all fields exist
-            required_fields = ["job_title", "company", "location", "salary", "description", "original_source"]
+            required_fields = ["job_title", "company", "location", "salary"]
             for field in required_fields:
                 if field not in parsed_data:
                     parsed_data[field] = ""
@@ -108,11 +111,19 @@ class ParsioApp(QWidget):
             return parsed_data
 
         except json.JSONDecodeError:
-            self.log(f"Gemini returned invalid JSON: {raw_output}")
+            self.save_error(raw_output)
             return None
         except Exception as e:
-            self.log(f"Gemini error: {e}")
+            self.save_error(str(e))
             return None
+
+    def save_error(self, content):
+        try:
+            with open(ERROR_FILE, "a", encoding="utf-8") as f:
+                f.write("\n--- Gemini Output Error ---\n")
+                f.write(content + "\n")
+        except Exception as e:
+            self.log(f"Failed to save error log: {e}")
 
     def commit_changes(self):
         if not self.pending_changes:
@@ -122,7 +133,7 @@ class ParsioApp(QWidget):
             df_new = pd.DataFrame(self.pending_changes)
 
             # Ensure consistent column order
-            cols = ["job_title", "company", "location", "salary", "description", "original_source"]
+            cols = ["job_title", "company", "location", "salary"]
             df_new = df_new[cols]
 
             try:
