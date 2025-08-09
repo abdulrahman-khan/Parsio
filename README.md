@@ -5,6 +5,10 @@ uses gemini LLM to parse job application information, automatically storing that
 - connection with email clients to automatically update application status 
 - insightful dashboard view providing application statistics
 
+## todo
+- add settings menu to enter gemini api key
+- button to clear the view
+- change the excel sheet to local sql lite 
 
 ---
 
