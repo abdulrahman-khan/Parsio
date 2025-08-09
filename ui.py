@@ -1,11 +1,18 @@
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QPushButton, QTextEdit
 from PyQt5.QtGui import QGuiApplication
 from parser import parse_with_gemini
-from data_manager import save_to_excel, log_error
+from PyQt5.QtGui import QIcon
+import os
+from data_manager import save_to_excel 
 
 class ParsioApp(QWidget):
     def __init__(self):
         super().__init__()
+        
+        icon_path = os.path.join(os.path.dirname(__file__), "images/icon.png") 
+        self.setWindowIcon(QIcon(icon_path))
+
+        
         self.pending_changes = []  # List of dicts
         self.init_ui()
 
@@ -33,6 +40,12 @@ class ParsioApp(QWidget):
         right_panel.addWidget(btn_commit)
 
         layout.addLayout(right_panel, stretch=1)
+        
+        self.apply_styles()
+
+# end of init ui ==========================
+        
+        
 
     def handle_paste(self):
         clipboard_text = QGuiApplication.clipboard().text().strip()
@@ -69,3 +82,34 @@ class ParsioApp(QWidget):
 
     def log(self, message):
         self.log_board.append(message)
+        
+    def apply_styles(self):
+        self.setStyleSheet("""
+            QWidget {
+                background-color: #0B1D51;  /* dark blue */
+                color: black;
+                font-family: Arial, sans-serif;
+                font-size: 14px;
+            }
+            QTextEdit {
+                background-color: #D6D9E0;  /* light gray/blue */
+                color: black;
+                border: 1px solid #324A80;  /* medium dark blue border */
+                border-radius: 5px;
+            }
+            QPushButton {
+                background-color: #081B40;  /* darker blue */
+                color: white;
+                border: none;
+                padding: 8px 15px;
+                border-radius: 5px;
+            }
+            QPushButton:hover {
+                background-color: #1A2E6B;  /* lighter blue on hover */
+            }
+            QPushButton:pressed {
+                background-color: #050E2A;  /* darkest blue on press */
+            }
+        """)
+
+

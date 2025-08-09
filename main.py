@@ -1,6 +1,6 @@
 import sys
 from PyQt5.QtWidgets import QApplication
-from ui import ParsioApp  # Import your UI class
+from ui import ParsioApp 
 
 def main():
     app = QApplication(sys.argv)
