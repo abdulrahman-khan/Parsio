@@ -18,7 +18,7 @@ class Ui_ParsioApp(object):
         ParsioApp.setObjectName("ParsioApp")
         ParsioApp.resize(701, 367)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(".\\images/icon.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(".\\images\\icon.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 
         ParsioApp.setWindowIcon(icon)
         ParsioApp.setStyleSheet("QWidget {\n"
