@@ -1,6 +1,10 @@
-# PARSIO - Job Application Parser
-
+# PARSIO - AI Job Application Tracker
 A desktop application that streamlines the job application tracking process by automatically parsing job postings using Google's Gemini LLM and storing structured data in a local SQLite database.
+
+<div align="center">
+  <img width="512" height="512" alt="icon" src="https://github.com/user-attachments/assets/b2d4a5af-0042-4b3c-a761-f346cfe7d14e" />
+</div>
+
 
 ## Project Purpose
 
