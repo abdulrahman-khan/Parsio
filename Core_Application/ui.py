@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QMainWindow, QApplication
-from PyQt5.QtGui import QGuiApplication
+from PyQt5.QtGui import QGuiApplication, QIcon
 from interface import Ui_ParsioApp
 from parser import parse_with_gemini
 from database_context import fetch_url_content, db
@@ -10,6 +10,8 @@ import os
 class ParsioApp(QMainWindow):
     def __init__(self):
         super().__init__()
+        # icon_path = os.path.join(os.path.dirname(__file__), "..", "Data", "icon2.png")
+        # self.setWindowIcon(QIcon(icon_path))
         
         self.ui = Ui_ParsioApp()
         self.ui.setupUi(self)
