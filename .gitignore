@@ -21,3 +21,9 @@ htmlcov/
 
 job-application-sheets-cbb9a3a754b5.json
 job_links.txt
+Data/job_postings.db
+data/job_postings.xlsx
+Data/error.txt
+Data/parsio_settings.json
+data/job_postings.xlsx
+data/job_postings.xlsx

@@ -1,0 +1,16 @@
+import sys
+from PyQt5.QtWidgets import QApplication
+from ui import ParsioApp
+
+
+
+def main():
+
+    # start PyQt5 application
+    app = QApplication(sys.argv)
+    window = ParsioApp()
+    window.show()
+    sys.exit(app.exec_())
+
+if __name__ == "__main__":
+    main()

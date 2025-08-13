@@ -1,7 +1,7 @@
 import os
 import sys
 from PyQt5.QtWidgets import QApplication
-from ui import ParsioApp
+from Core_Application.ui import ParsioApp
 
 def ensure_env_file():
     env_path = ".env"
