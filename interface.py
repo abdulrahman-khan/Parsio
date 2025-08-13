@@ -9,6 +9,8 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+import sys
+from PyQt5 import QtWidgets, QtGui
 
 
 class Ui_ParsioApp(object):
@@ -16,7 +18,8 @@ class Ui_ParsioApp(object):
         ParsioApp.setObjectName("ParsioApp")
         ParsioApp.resize(701, 367)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(".\\images/icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(".\\images/icon.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+
         ParsioApp.setWindowIcon(icon)
         ParsioApp.setStyleSheet("QWidget {\n"
 "    background-color: #0B1D51;  /* dark blue */\n"
@@ -227,11 +230,24 @@ class Ui_ParsioApp(object):
         self.actionUser_Guide.setText(_translate("ParsioApp", "User Guide"))
 
 
+
 if __name__ == "__main__":
-    import sys
     app = QtWidgets.QApplication(sys.argv)
+    
+    
+    icon = QtGui.QIcon()  # Adjust path as needed
+    icon.addPixmap(QtGui.QPixmap(".\\images/icon2.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+    
+    app.setWindowIcon(icon)  # Set global app/taskbar icon
+
     ParsioApp = QtWidgets.QMainWindow()
     ui = Ui_ParsioApp()
     ui.setupUi(ParsioApp)
     ParsioApp.show()
+
     sys.exit(app.exec_())
+    
+    
+    
+
+
