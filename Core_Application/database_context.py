@@ -20,21 +20,51 @@ class database_context:
         self.data_dir = os.path.join(project_root, "Data")                              # project data root
 
 
-        # read default table name - create helper if first launch
+        # read default table name and API key - create helper if first launch
         try: 
             os.makedirs(os.path.dirname(self.HELPER_FILE), exist_ok=True)
             if os.path.exists(self.HELPER_FILE):
                 with open(self.HELPER_FILE, 'r') as file:
                     settings = json.load(file)
                     self.TABLE_NAME = settings.get("table_name", "job_postings")
+                    self.GEMINI_API_KEY = settings.get("gemini_api_key", "")
             else:
                 with open(self.HELPER_FILE, 'w') as file:
-                    settings = {"table_name": "job_postings"}
-                    json.dump(settings, file)
+                    settings = {
+                        "table_name": "job_postings",
+                        "gemini_api_key": ""
+                    }
+                    json.dump(settings, file, indent=4)
                     self.TABLE_NAME = "job_postings"
+                    self.GEMINI_API_KEY = ""
         except Exception as e:
             print(f"Settings file error: {e}")
             self.TABLE_NAME = "job_postings"
+            self.GEMINI_API_KEY = ""
+
+    def get_gemini_api_key(self) -> str:
+        """Get the Gemini API key from settings"""
+        return self.GEMINI_API_KEY
+
+    def set_gemini_api_key(self, api_key: str) -> bool:
+        """Set the Gemini API key in settings"""
+        try:
+            if os.path.exists(self.HELPER_FILE):
+                with open(self.HELPER_FILE, 'r') as file:
+                    settings = json.load(file)
+            else:
+                settings = {"table_name": self.TABLE_NAME}
+            
+            settings["gemini_api_key"] = api_key
+            
+            with open(self.HELPER_FILE, 'w') as file:
+                json.dump(settings, file, indent=4)
+            
+            self.GEMINI_API_KEY = api_key
+            return True
+        except Exception as e:
+            print(f"Failed to save API key: {e}")
+            return False
 
     def init_database(self):
         """Inits the database and table on App startup"""

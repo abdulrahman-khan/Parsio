@@ -9,12 +9,6 @@ import os
 
 class ParsioApp(QMainWindow):
     def __init__(self):
-        # Check for env file
-        env_path = ".env"
-        if not os.path.exists(env_path):
-            with open(env_path, "w") as f:
-                f.write('GEMINI_API_KEY = ""\n')
-
         super().__init__()
         
         self.ui = Ui_ParsioApp()
@@ -38,6 +32,12 @@ class ParsioApp(QMainWindow):
             self.log("Clipboard is empty.")
             return
 
+        # Check if API key is configured
+        api_key = db.get_gemini_api_key()
+        if not api_key:
+            self.log("Error: Gemini API key not configured. Please set your API key in the settings.")
+            return
+
         # URL OR RAW TEXT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         if clipboard_text.lower().startswith("http"):
             content = fetch_url_content(clipboard_text)
@@ -45,13 +45,17 @@ class ParsioApp(QMainWindow):
             content = clipboard_text
 
         if content:
-            parsed_data = parse_with_gemini(content)
-            if parsed_data:
-                self.pending_changes.append(parsed_data)
-                self.log(f"Added to pending: {parsed_data['job_title']} at {parsed_data['company']}")
-            else:
-                # TODO: Improve error handling
-                self.log("Unable to parse job posting. Check error.txt for details.")
+            try:
+                parsed_data = parse_with_gemini(content, api_key)
+                if parsed_data:
+                    self.pending_changes.append(parsed_data)
+                    self.log(f"Added to pending: {parsed_data['job_title']} at {parsed_data['company']}")
+                else:
+                    self.log("Unable to parse job posting. Check error.txt for details.")
+            except ValueError as e:
+                self.log(f"API Key Error: {e}")
+            except Exception as e:
+                self.log(f"Parsing Error: {e}")
 
     def commit_changes(self):
         """Save pending changes to database"""

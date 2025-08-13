@@ -1,14 +1,17 @@
 import json
 import google.generativeai as genai
-from dotenv import load_dotenv
 import os
 
 from utils import extract_json  
-load_dotenv()
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-def parse_with_gemini(text):
+def parse_with_gemini(text, api_key: str):
     """Parses info into json"""
+    if not api_key:
+        raise ValueError("Gemini API key is required")
+    
+    # Configure Gemini with the provided API key
+    genai.configure(api_key=api_key)
+    
     # TODO: error handling
     prompt = (
             "Extract the following fields from the job posting text below: "
